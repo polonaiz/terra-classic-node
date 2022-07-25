@@ -1,0 +1,9 @@
+{
+	"name": "Ubuntu",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { "VARIANT": "ubuntu-22.04" }
+	},
+	"postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+	"remoteUser": "vscode"
+}
