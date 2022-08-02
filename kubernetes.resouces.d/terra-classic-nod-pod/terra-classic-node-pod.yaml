@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: terra-classic-node-pod
+spec:
+  restartPolicy: Never
+  # initContainers:
+  #   - 
+  # download genesis file
+  containers:
+    - name: terra-classic-node-container
+      image: polonaiz/terra-classic-node
+      command: ["/bin/sh", "-c", "--"]
+      args: ["while true; do sleep 30; done;"] 
+        # to be changed terrad start --x-crisis-skip-assert-invariants
+      resources:
+        requests:
+          memory: "32Gi"
+          cpu: "400m"
+        limits:
+          memory: "32Gi"
+          cpu: "400m"
+      volumeMounts:
+        - mountPath: /root/.terra
+          name: terra-classic-node-data
+  volumes:
+    - name: terra-classic-node-data
+      persistentVolumeClaim:
+        claimName: terra-classic-node-data
