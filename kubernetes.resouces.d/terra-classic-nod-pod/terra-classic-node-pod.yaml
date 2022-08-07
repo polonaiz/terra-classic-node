@@ -6,7 +6,9 @@ spec:
   restartPolicy: Never
   # initContainers:
   #   - 
-  # download genesis file
+    # terrad init
+    # change config
+    # download genesis file
   containers:
     - name: terra-classic-node-container
       image: polonaiz/terra-classic-node

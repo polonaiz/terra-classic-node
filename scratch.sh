@@ -26,3 +26,14 @@ cp /workspaces/terra-classic-full-node/addrbook.json ~/.terra/config/addrbook.js
 
 # start node
 terrad start --x-crisis-skip-assert-invariants
+
+#
+gcloud config set project
+gcloud container clusters list 
+gcloud container clusters get-credentials
+kubectl get storageclasses
+
+time tar --zstd -cf /tmp/.terra.config.tar.zst .terra/config
+time tar --zstd -xf .terra.config.tar.zst
+
+curl http://localhost:1317/blocks/latest | jq .block.header  

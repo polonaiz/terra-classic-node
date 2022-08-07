@@ -6,7 +6,7 @@ RUN apt-get update && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
 RUN apt-get update && \
-    apt-get install -y vim bash-completion wget sysstat dstat net-tools curl
+    apt-get install -y vim bash-completion wget sysstat dstat net-tools curl tmux
 
 RUN wget https://github.com/terra-money/classic-core/releases/download/v0.5.20/terra_0.5.20_Linux_x86_64.tar.gz && \
     tar zxvf terra_0.5.20_Linux_x86_64.tar.gz && \
