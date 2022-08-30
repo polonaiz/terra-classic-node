@@ -18,10 +18,10 @@ spec:
       resources:
         requests:
           memory: "32Gi"
-          cpu: "400m"
+          cpu: "300m"
         limits:
           memory: "32Gi"
-          cpu: "400m"
+          cpu: "300m"
       volumeMounts:
         - mountPath: /root/.terra
           name: terra-classic-node-data

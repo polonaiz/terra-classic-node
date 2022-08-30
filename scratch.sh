@@ -28,6 +28,7 @@ cp /workspaces/terra-classic-full-node/addrbook.json ~/.terra/config/addrbook.js
 terrad start --x-crisis-skip-assert-invariants
 
 #
+gcloud auth list
 gcloud config set project
 gcloud container clusters list 
 gcloud container clusters get-credentials
