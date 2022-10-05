@@ -8,10 +8,8 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -y vim bash-completion wget sysstat dstat net-tools curl tmux
 
-RUN wget https://github.com/terra-money/classic-core/releases/download/v0.5.20/terra_0.5.20_Linux_x86_64.tar.gz && \
-    tar zxvf terra_0.5.20_Linux_x86_64.tar.gz && \
+RUN wget https://github.com/terra-money/classic-core/releases/download/v0.5.22/terra_0.5.22_Linux_x86_64.tar.gz && \
+    tar zxvf terra_0.5.22_Linux_x86_64.tar.gz && \
     mv ./terrad /usr/local/bin && \
     which terrad && \
-    rm ./terra_0.5.20_Linux_x86_64.tar.gz
-
-COPY addrbook.json /addrbook.json
+    rm ./terra_0.5.22_Linux_x86_64.tar.gz

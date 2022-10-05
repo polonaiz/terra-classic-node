@@ -3,34 +3,34 @@ kind: Pod
 metadata:
   name: terra-classic-node-pod
   labels:
-    app: terra-classic-node
+    app: terra-classic-node-label
 spec:
   restartPolicy: Never
-  # initContainers:
-  #   - 
-    # terrad init
-    # change config
-    # download genesis file
+  volumes:
+    - name: terra-classic-node-data
+      persistentVolumeClaim:
+        claimName: terra-classic-node-data-pvc
+    # - name: quicksync-downloader-data
+    #   persistentVolumeClaim:
+    #     claimName: quicksync-downloader-data
   containers:
     - name: terra-classic-node-container
       image: polonaiz/terra-classic-node
       command: ["/bin/sh", "-c", "--"]
       args: ["while true; do sleep 30; done;"] 
-        # to be changed terrad start --x-crisis-skip-assert-invariants
-      resources:
-        requests:
-          memory: "64Gi"
-          cpu: "300m"
-        limits:
-          memory: "64Gi"
-          cpu: "300m"
       volumeMounts:
         - mountPath: /data
-          name: terra-classic-node-data-std
+          name: terra-classic-node-data
+        # - mountPath: /download
+        #   name: quicksync-downloader-data
+      resources:
+        requests:
+          memory: "32Gi"
+          cpu: "200m"
+        limits:
+          memory: "32Gi"
+          cpu: "200m"
       ports:
         - containerPort: 1317
           name: lcd
-  volumes:
-    - name: terra-classic-node-data-std
-      persistentVolumeClaim:
-        claimName: terra-classic-node-data-std
+        # to be changed terrad start --x-crisis-skip-assert-invariants
