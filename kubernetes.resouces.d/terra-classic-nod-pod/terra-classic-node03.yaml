@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: terra-classic-node03-data
+spec:
+  storageClassName: standard-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Ti
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: terra-classic-node03-pod
+  labels:
+    app: terra-classic-node
+    node: terra-classic-node03
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: terra-classic-node-data
+      persistentVolumeClaim:
+        claimName: terra-classic-node03-data
+    - name: quicksync-downloader-data
+      persistentVolumeClaim:
+        claimName: quicksync-downloader-data
+  containers:
+    - name: terra-classic-node-container
+      image: polonaiz/terra-classic-node
+      command: ["/bin/sh", "-c", "--"]
+      args: ["while true; do sleep 30; done;"] 
+      volumeMounts:
+        - mountPath: /data
+          name: terra-classic-node-data
+        - mountPath: /quicksync
+          name: quicksync-downloader-data
+      resources:
+        requests:
+          memory: "32Gi"
+          cpu: "200m"
+        limits:
+          memory: "32Gi"
+          cpu: "200m"
+      ports:
+        - containerPort: 1317
+          name: lcd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: terra-classic-lcd03
+spec:
+  selector:
+    node: terra-classic-node03
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 1317
+    targetPort: 1317
+---
