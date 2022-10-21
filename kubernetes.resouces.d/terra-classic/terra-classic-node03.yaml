@@ -23,9 +23,9 @@ spec:
     - name: terra-classic-node-data
       persistentVolumeClaim:
         claimName: terra-classic-node03-data
-    - name: quicksync-downloader-data
-      persistentVolumeClaim:
-        claimName: quicksync-downloader-data
+    # - name: quicksync-downloader-data
+    #   persistentVolumeClaim:
+    #     claimName: quicksync-downloader-data
   containers:
     - name: terra-classic-node-container
       image: polonaiz/terra-classic-node
@@ -34,8 +34,8 @@ spec:
       volumeMounts:
         - mountPath: /data
           name: terra-classic-node-data
-        - mountPath: /quicksync
-          name: quicksync-downloader-data
+        # - mountPath: /quicksync
+        #   name: quicksync-downloader-data
       resources:
         requests:
           memory: "32Gi"
