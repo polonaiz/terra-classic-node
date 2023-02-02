@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: terra-classic-node
+spec:
+  ports:
+  - port: 1317
+    name: lcd
+  clusterIP: None
+  selector:
+    app: terra-classic-node
+
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: terra-classic-node
+spec:
+  # 
+  serviceName: terra-classic-node
+  selector:
+    matchLabels:
+      app: terra-classic-node
+  replicas: 1
+  #
+  volumeClaimTemplates:
+    - metadata:
+        name: terra-classic-data
+      spec:
+        storageClassName: standard-rwo
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 12Ti
+  #
+  template:
+    metadata:
+      labels:
+        app: terra-classic-node
+    spec:
+      initContainers:
+      # # run only if not initialzied. need to add check script
+      # - name: init
+      #   image: polonaiz/terra-classic-node:0.5.22
+      #   command: ["/bin/sh", "-c", "--"]
+      #   args: ["while true; do sleep 30; done;"] 
+      #   args: 
+      #     - terrad init --chain-id=columbus-5 $HOSTNAME &&
+      #       wget -O /root/.terra/config/genesis.json https://columbus-genesis.s3.ap-northeast-1.amazonaws.com/columbus-5-genesis.json &&
+      #       sed -i -e 's/pruning = \"default\"/pruning = \"nothing\"/g' /root/.terra/config/app.toml &&
+      #       sed -i -e '/\[api\]/,+3 s/enable = false/enable = true/g' /root/.terra/config/app.toml &&
+      #       sed -i -e '/\[api\]/,+6 s/swagger = false/swagger = true/g' /root/.terra/config/app.toml &&
+      #       sed -i -e 's/seeds = \"\"/seeds = \"cd0a58c2c9ee0613bf1988b3432fb2382f346a05@terra-mainnet-seed-1.stakin-nodes.com:26656,b1bdf6249fb58b4c8284aff8a9c5b2804d822261@seed.terra.synergynodes.com:26656,877c6b9f8fae610a4e886604399b33c0c7a985e2@terra.mainnet.seed.forbole.com:10056\"/g' /root/.terra/config/config.toml
+      #   volumeMounts:
+      #   - name: terra-classic-data
+      #     mountPath: /root/.terra
+      #   resources:
+      #     requests:
+      #       memory: "32Gi"
+      #       cpu: "2000m"
+      #     limits:
+      #       memory: "32Gi"
+      #       cpu: "2000m"
+      containers:
+      - name: runner
+        image: polonaiz/terra-classic-node:0.5.22
+        command: 
+          - terrad
+        args: 
+          - start
+          - --log_level=info
+          - --log_format=json
+          - --trace 
+          - --x-crisis-skip-assert-invariants
+        # command: ["/bin/sh", "-c", "--"]
+        # args: ["while true; do sleep 30; done;"] 
+        # 
+        resources:
+          requests:
+            memory: "32Gi"
+            cpu: "2000m"
+          limits:
+            memory: "32Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: terra-classic-data
+          mountPath: /root/.terra
+        ports:
+        - containerPort: 1317
+          name: lcd
+
+# # restore from snapshot with streaming decompression from gcs
+# time gsutil cat gs://quicksync-archive/columbus-5-archive.20220830.1141.tar.lz4 | pv -s 5185795721522 | lz4 -d | tar xf - -C ~/.terra
+
+# # reset when data corrupted
+# terrad unsafe-reset-all
+
+# # start
+# terrad start --x-crisis-skip-assert-invariants

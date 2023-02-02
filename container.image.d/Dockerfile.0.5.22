@@ -1,0 +1,20 @@
+FROM ubuntu:22.10 AS runner
+
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN apt-get update && \
+    apt-get install -y vim bash-completion wget sysstat dstat net-tools curl tmux jq dnsutils liblz4-tool pv
+
+RUN wget https://github.com/terra-money/classic-core/releases/download/v0.5.22/terra_0.5.22_Linux_x86_64.tar.gz && \
+    tar zxvf terra_0.5.22_Linux_x86_64.tar.gz && \
+    mv ./terrad /usr/local/bin && \
+    which terrad && \
+    rm ./terra_0.5.22_Linux_x86_64.tar.gz
+
+RUN apt-get install -y apt-transport-https ca-certificates gnupg && \
+    (echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list) && \
+    (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - ) && \
+    apt-get update && apt-get -y install google-cloud-cli

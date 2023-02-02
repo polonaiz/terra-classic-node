@@ -1,0 +1,33 @@
+########
+FROM golang:1.19 as builder
+
+RUN git clone https://github.com/terra-money/classic-core.git ~/terra-classic
+
+RUN cd ~/terra-classic && \
+    git checkout v0.5.23 && \
+    make install && \
+    mv /go/bin/terrad /usr/local/bin/terrad
+
+RUN cp /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v0.16.6/api/libwasmvm.so /usr/local/lib && \
+    ldconfig
+
+
+########
+FROM ubuntu:22.10 AS runner
+
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN apt-get update && \
+    apt-get install -y vim bash-completion wget sysstat dstat net-tools curl tmux jq dnsutils liblz4-tool pv
+
+COPY --from=builder /usr/local/bin/terrad /usr/local/bin/
+COPY --from=builder /usr/local/lib/libwasmvm.so /usr/local/lib/
+RUN ldconfig
+
+RUN apt-get install -y apt-transport-https ca-certificates gnupg && \
+    (echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list) && \
+    (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - ) && \
+    apt-get update && apt-get -y install google-cloud-cli
