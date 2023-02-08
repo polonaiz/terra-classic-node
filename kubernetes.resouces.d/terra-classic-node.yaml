@@ -81,10 +81,10 @@ spec:
         resources:
           requests:
             memory: "32Gi"
-            cpu: "2000m"
+            cpu: "1600m" # 400m = 1 core
           limits:
             memory: "32Gi"
-            cpu: "2000m"
+            cpu: "1600m"
         volumeMounts:
         - name: terra-classic-data
           mountPath: /root/.terra
