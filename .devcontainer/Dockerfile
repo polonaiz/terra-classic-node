@@ -38,3 +38,11 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt-get update
 RUN apt-get install -y docker-ce-cli
+
+#k9s
+RUN mkdir /tmp/k9s && \
+    cd /tmp/k9s && \
+    wget https://github.com/derailed/k9s/releases/download/v0.27.2/k9s_Linux_amd64.tar.gz && \
+    tar zxvf k9s_Linux_amd64.tar.gz && \
+    mv k9s /usr/local/bin && \
+    rm -rf /tmp/k9s
