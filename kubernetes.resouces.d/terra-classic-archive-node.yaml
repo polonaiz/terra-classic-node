@@ -2,44 +2,46 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: terra-classic-node
+  name: terra-classic-archive-node
 spec:
   ports:
   - port: 1317
     name: lcd
+  - port: 26657
+    name: rpc
   clusterIP: None
   selector:
-    app: terra-classic-node
+    app: terra-classic-archive-node
 
 
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: terra-classic-node
+  name: terra-classic-archive-node
 spec:
   # 
-  serviceName: terra-classic-node
+  serviceName: terra-classic-archive-node
   selector:
     matchLabels:
-      app: terra-classic-node
-  replicas: 0
+      app: terra-classic-archive-node
+  replicas: 1
   #
   volumeClaimTemplates:
     - metadata:
-        name: terra-classic-data
+        name: terra-classic-archive-data
       spec:
-        storageClassName: standard-rwo
+        storageClassName: premium-rwo
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 12Ti
+            storage: 8Ti
   #
   template:
     metadata:
       labels:
-        app: terra-classic-node
+        app: terra-classic-archive-node
     spec:
       initContainers:
       # # run only if not initialzied. need to add check script
@@ -71,6 +73,7 @@ spec:
           - terrad
         args: 
           - start
+          - --home=/data/lib/terrad
           - --log_level=info
           - --log_format=json
           - --trace 
@@ -80,17 +83,19 @@ spec:
         # 
         resources:
           requests:
-            memory: "32Gi"
-            cpu: "800m" # 400m = 1 core
+            memory: "48Gi"
+            cpu: "1200m" # 400m = 1 core
           limits:
-            memory: "32Gi"
-            cpu: "800m"
+            memory: "48Gi"
+            cpu: "1200m"
         volumeMounts:
-        - name: terra-classic-data
-          mountPath: /root/.terra
+        - name: terra-classic-archive-data
+          mountPath: /data
         ports:
         - containerPort: 1317
           name: lcd
+        - containerPort: 26657
+          name: rpc
 
 # # restore from snapshot with streaming decompression from gcs
 # time gsutil cat gs://quicksync-archive/columbus-5-archive.20220830.1141.tar.lz4 | pv -s 5185795721522 | lz4 -d | tar xf - -C ~/.terra
@@ -100,5 +105,3 @@ spec:
 
 # # start
 # terrad start --x-crisis-skip-assert-invariants
-
-# time gsutil cat gs://quicksync-archive/terra-clasic-node-data-20230301.tar.zst | pv -s 1571343334708 | tar x -I 'zstd -T4' -f - -C /data/lib/terrad
